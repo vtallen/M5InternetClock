@@ -5,9 +5,12 @@
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <NTPClient.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
 
 #include <widgets/main_clock.h>
 #include <conf_parser.h>
+#include <stocks/stocks.h>
 
 RTC_TimeTypeDef TimeStruct;
 RTC_DateTypeDef DateStruct;
@@ -22,19 +25,17 @@ M5Canvas canvas(&display);
 */
 
 void setup() {
-
-  char* SSID {Conf::getSSID()};
-  char* PASSWORD {Conf::getPASSWORD()};
-
   M5.begin();
   SD.begin(4);
-  
+
+  Conf::loadConfig();
+  char* SSID = Conf::getSSID();
+  char* PASSWORD = Conf::getPASSWORD();
+
   display.begin();
   display.setTextDatum(top_left);
 
   Serial.begin(115200);
-
-  Conf::loadConfig();
 
   WiFi.begin(SSID, PASSWORD);
 
@@ -77,6 +78,9 @@ void setup() {
   Main_Clock::setTimeStruct(&TimeStruct);
   Main_Clock::setDateStruct(&DateStruct);
   Main_Clock::setCanvas(&canvas);
+
+  //Main_Clock::drawTemp(0, 0, 1);
+  Serial.println(Stocks::getName("B8AY9B23WT5CR3LP", "AAPL"));
 }
 
 void loop() {
@@ -103,13 +107,11 @@ void loop() {
   // canvas.setFont(&fonts::Orbitron_Light_24);
   // canvas.drawString("Hello World", 0, 50);
 
-  Main_Clock::drawClock(30, 40, 1.5);
-
+  Main_Clock::drawWidget();
   // // Only the following process is actually drawn on the panel.
   
   display.startWrite(); 
   canvas.pushSprite(0, 0);
   display.endWrite();
-
   //delay(1000);
 }

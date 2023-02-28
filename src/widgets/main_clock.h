@@ -7,4 +7,8 @@ namespace Main_Clock {
     void setDateStruct(RTC_DateTypeDef *DateStructPtr);
     
     void drawClock(int x, int y, float size, bool is_12_hr = true);
+    void drawDate(int x, int y, float size);
+    void drawTemp(int x, int y, float size);
+    void drawScrollingStocks(int y, float size);
+    void drawWidget();
 }
