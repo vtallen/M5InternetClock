@@ -11,6 +11,8 @@ namespace Main_Clock {
     RTC_TimeTypeDef* TimeStruct;
     RTC_DateTypeDef* DateStruct;
 
+    M5Canvas* canvas;
+
     const lgfx::v1::RLEfont CLOCK_FONT = fonts::Font7;
 
     void setTimeStruct(RTC_TimeTypeDef *TimeStructPtr) {
@@ -21,6 +23,10 @@ namespace Main_Clock {
     void setDateStruct(RTC_DateTypeDef *DateStructPtr) {
         assert(DateStructPtr);
         DateStruct = DateStructPtr;
+    }
+
+    void setCanvas(M5Canvas *CanvasPtr) {
+        canvas = CanvasPtr;
     }
 
     //Exactly what it sounds like  
@@ -63,10 +69,11 @@ namespace Main_Clock {
         } else {
             return String(time);
         }
+
     }
 
     //Draws the clock on to the canvas, does not update the canvas with the new information
-    void drawClock(M5Canvas canvas, int x, int y, float size, bool is_12_hr = true) {
+    void drawClock(int x, int y, float size, bool is_12_hr = true) {
         String hour;
         if (is_12_hr) {
             hour = String(addLeadingZero(convertToTwelveHour(TimeStruct->Hours)));
@@ -77,20 +84,24 @@ namespace Main_Clock {
         String second = String(addLeadingZero(TimeStruct->Seconds));
 
         String time = hour + ":" + minute;
-
-        canvas.setFont(&Theme::CLOCK_FONT);
-        canvas.setTextColor(Theme::FOREGROUND_COLOR, Theme::BACKGROUND_COLOR);
+        
+        canvas->setFont(&Theme::CLOCK_FONT);
+        canvas->setTextColor(Theme::FOREGROUND_COLOR, Theme::BACKGROUND_COLOR);
         
         //Draw the hour and minute on the canvas
-        canvas.setTextSize(size);
-        canvas.setCursor(x, y);
-        canvas.drawString(time, x, y);
+        canvas->setTextSize(size);
+        canvas->setCursor(x, y);
+        canvas->drawString(time, x, y);
 
         // Draw the seconds on the canvas at half the size of the hours. Then scale the offset using the size to place it
         // on the bottom right corner of the hours and minutes.
-        canvas.setTextSize(size/2);
-        canvas.setCursor(x + (140 * size), y + (22 * size));
-        canvas.drawString((":" + second), x + (140 * size), y + (22 * size));
+        canvas->setTextSize(size/2);
+        canvas->setCursor(x + (140 * size), y + (22 * size));
+        canvas->drawString((":" + second), x + (140 * size), y + (22 * size));
+    }
+
+    void drawScrollingStocks(int y, float size) {
+
     }
 
     // Draws all of the parts of the widget on to the canvas

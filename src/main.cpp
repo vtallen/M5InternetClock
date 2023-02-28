@@ -76,6 +76,7 @@ void setup() {
   // Pass the time and date structs to the clock widget so that it does not need them as a parameter
   Main_Clock::setTimeStruct(&TimeStruct);
   Main_Clock::setDateStruct(&DateStruct);
+  Main_Clock::setCanvas(&canvas);
 }
 
 void loop() {
@@ -102,7 +103,7 @@ void loop() {
   // canvas.setFont(&fonts::Orbitron_Light_24);
   // canvas.drawString("Hello World", 0, 50);
 
-  Main_Clock::drawClock(canvas, 30, 40, 1.5);
+  Main_Clock::drawClock(30, 40, 1.5);
 
   // // Only the following process is actually drawn on the panel.
   
