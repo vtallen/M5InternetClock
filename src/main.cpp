@@ -9,9 +9,6 @@
 #include <widgets/main_clock.h>
 #include <conf_parser.h>
 
-int32_t x;
-int32_t y;
-
 RTC_TimeTypeDef TimeStruct;
 RTC_DateTypeDef DateStruct;
 
@@ -20,10 +17,8 @@ M5Canvas canvas(&display);
 
 //TODO
 /*
-- Have the ssid and password be read from the SD
 - Add a way to set the timezone from that same file
 - Add a way to set the time manually, and a variable indicating that this needs to be done.
-
 */
 
 void setup() {
@@ -43,7 +38,7 @@ void setup() {
 
   WiFi.begin(SSID, PASSWORD);
 
-  delay(2000);
+  delay(2000); // Wait for wifi to connect
   
   // Set the time/date using WiFi
   if (WiFi.status() == WL_CONNECTED) {
@@ -68,16 +63,19 @@ void setup() {
     M5.Rtc.SetDate(&DateStruct); 
 
     SD.end();
+  } else {
+    Serial.println("WiFi Connection failed! Set time manually.");
   }
-  
-  delay(1000);
 
   display.begin();
-  display.fillScreen(TFT_BLACK);
   display.setTextDatum(top_left);
 
   delete[] SSID;
   delete[] PASSWORD;
+
+  // Pass the time and date structs to the clock widget so that it does not need them as a parameter
+  Main_Clock::setTimeStruct(&TimeStruct);
+  Main_Clock::setDateStruct(&DateStruct);
 }
 
 void loop() {
@@ -104,7 +102,7 @@ void loop() {
   // canvas.setFont(&fonts::Orbitron_Light_24);
   // canvas.drawString("Hello World", 0, 50);
 
-  Main_Clock::drawClock(TimeStruct, canvas, 30, 40, 1.5);
+  Main_Clock::drawClock(canvas, 30, 40, 1.5);
 
   // // Only the following process is actually drawn on the panel.
   
