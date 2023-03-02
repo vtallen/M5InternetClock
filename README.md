@@ -9,4 +9,5 @@ Place a WidgetClock.txt on the root of your sd card containing the WIFI SSID and
 ```
 SSID = SSID_HERE
 PASSWORD = PASSWORD_HERE
+ALPHA_VANTAGE_KEY = API_KEY_HERE
 ```
