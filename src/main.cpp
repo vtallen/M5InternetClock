@@ -23,6 +23,14 @@ M5Canvas canvas(&display);
 - Add a way to set the timezone from that same file
 - Add a way to set the time manually, and a variable indicating that this needs
 to be done.
+
+- Add a scrolling stock ticker at the bottom of main_clock.cpp
+- Add a temperature for city section on one of the top corners
+
+- Add a controller to switch between widgets every x seconds
+
+- Add a stock witdget, allow multiple instances with different stocks to be
+called
 */
 
 void setup() {
@@ -77,9 +85,6 @@ void setup() {
   display.begin();
   display.setTextDatum(top_left);
 
-  delete[] SSID;
-  delete[] PASSWORD;
-
   // Pass the time and date structs to the clock widget so that it does not need
   // them as a parameter
   Main_Clock::setTimeStruct(&TimeStruct);
@@ -87,23 +92,15 @@ void setup() {
   Main_Clock::setCanvas(&canvas);
   // gets the API key for the alpha vantage API from the conf_parser.cpp
   // Stocks::init();
-
 }
 
 void loop() {
-  constexpr u_int16_t BACKGROUND_COLOR = 0xAE29;
-  constexpr u_int16_t FOREGROUND_COLOR = 0x3A05;
   M5.Rtc.GetTime(&TimeStruct);
   M5.Rtc.GetDate(&DateStruct);
 
-  String hour = String(TimeStruct.Hours);
-  String minute = String(TimeStruct.Minutes);
-  String second = String(TimeStruct.Seconds);
-
-  String time = hour + ":" + minute + ":" + second;
-
   Main_Clock::drawWidget();
 
+  // Update the display
   display.startWrite();
   canvas.pushSprite(0, 0);
   display.endWrite();
