@@ -7,6 +7,8 @@
 namespace Stocks {
 char *ALPHA_VANTAGE_KEY;
 
+// Do not call before the config file has been fully read and parsed, it will
+// segfault/be caught by the assert statement
 void init() { ALPHA_VANTAGE_KEY = Conf::getALPHA_VANTAGE_KEY(); }
 
 StaticJsonDocument<2000> getStockQuote(const char *stock_symbol) {

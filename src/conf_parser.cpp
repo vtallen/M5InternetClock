@@ -1,5 +1,7 @@
 #include <M5Core2.h>
 
+#include <stocks/stocks.h>
+
 namespace Conf {
 // WiFi Credentials
 char *SSID{};
@@ -64,6 +66,9 @@ void loadConfig() {
       parseLine(c);
     }
     file.close();
+
+    // causes stocks.cpp to call getALPHA_VANTAGE_KEY
+    Stocks::init();
   } else {
     Serial.println("Failed to open file.");
   }
