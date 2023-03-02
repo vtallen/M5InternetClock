@@ -1,6 +1,7 @@
 #include <Arduino.h>
 namespace Conf {
-    char* getSSID();
-    char* getPASSWORD();
-    void loadConfig();
-}
+char *getSSID();
+char *getPASSWORD();
+char *getALPHA_VANTAGE_KEY();
+void loadConfig();
+} // namespace Conf

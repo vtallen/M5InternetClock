@@ -1,16 +1,16 @@
 #include <Arduino.h>
+#include <ArduinoJson.h>
+#include <HTTPClient.h>
 #include <M5Core2.h>
-#include <SD.h>
 #include <M5GFX.h>
+#include <NTPClient.h>
+#include <SD.h>
 #include <WiFi.h>
 #include <WiFiUdp.h>
-#include <NTPClient.h>
-#include <HTTPClient.h>
-#include <ArduinoJson.h>
 
-#include <widgets/main_clock.h>
 #include <conf_parser.h>
 #include <stocks/stocks.h>
+#include <widgets/main_clock.h>
 
 RTC_TimeTypeDef TimeStruct;
 RTC_DateTypeDef DateStruct;
@@ -18,10 +18,11 @@ RTC_DateTypeDef DateStruct;
 M5GFX display;
 M5Canvas canvas(&display);
 
-//TODO
+// TODO
 /*
 - Add a way to set the timezone from that same file
-- Add a way to set the time manually, and a variable indicating that this needs to be done.
+- Add a way to set the time manually, and a variable indicating that this needs
+to be done.
 */
 
 void setup() {
@@ -29,8 +30,8 @@ void setup() {
   SD.begin(4);
 
   Conf::loadConfig();
-  char* SSID = Conf::getSSID();
-  char* PASSWORD = Conf::getPASSWORD();
+  char *SSID = Conf::getSSID();
+  char *PASSWORD = Conf::getPASSWORD();
 
   display.begin();
   display.setTextDatum(top_left);
@@ -40,28 +41,33 @@ void setup() {
   WiFi.begin(SSID, PASSWORD);
 
   delay(2000); // Wait for wifi to connect
-  
+
   // Set the time/date using WiFi
   if (WiFi.status() == WL_CONNECTED) {
     WiFiUDP ntpUDP;
     NTPClient timeClient(ntpUDP);
 
     timeClient.update();
-    timeClient.setTimeOffset(-18000); // Set to eastern time, will add the ability to chage this with a config file later
+    // Set to eastern time, will add the ability to chage this with a config
+    // file later
+    timeClient.setTimeOffset(-18000);
 
     unsigned long epochTime = timeClient.getEpochTime();
-    struct tm *ptm = gmtime ((time_t *)&epochTime);
-    
+    struct tm *ptm = gmtime((time_t *)&epochTime);
+
     TimeStruct.Hours = ptm->tm_hour;
     TimeStruct.Minutes = ptm->tm_min;
-    TimeStruct.Seconds = ptm ->tm_sec;
+    TimeStruct.Seconds = ptm->tm_sec;
     M5.Rtc.SetTime(&TimeStruct);
 
-    DateStruct.Month = ptm->tm_mon + 1; // The month is stored as a number from 0-11, therefore we must add 1 to it.
+    // The month is stored as a number from 0-11, therefore we must add 1 to it.
+    DateStruct.Month = ptm->tm_mon + 1;
     DateStruct.Date = ptm->tm_mday;
-    DateStruct.Year = ptm->tm_year + 1900; // The year is returned as the number of years since 1900, so we need to add 1900 to it
+    // The year is returned as the number of years since 1900, so we need to add
+    // 1900 to it
+    DateStruct.Year = ptm->tm_year + 1900;
     DateStruct.WeekDay = ptm->tm_wday;
-    M5.Rtc.SetDate(&DateStruct); 
+    M5.Rtc.SetDate(&DateStruct);
 
     SD.end();
   } else {
@@ -74,13 +80,14 @@ void setup() {
   delete[] SSID;
   delete[] PASSWORD;
 
-  // Pass the time and date structs to the clock widget so that it does not need them as a parameter
+  // Pass the time and date structs to the clock widget so that it does not need
+  // them as a parameter
   Main_Clock::setTimeStruct(&TimeStruct);
   Main_Clock::setDateStruct(&DateStruct);
   Main_Clock::setCanvas(&canvas);
+  // gets the API key for the alpha vantage API from the conf_parser.cpp
+  Stocks::init();
 
-  //Main_Clock::drawTemp(0, 0, 1);
-  Serial.println(Stocks::getName("B8AY9B23WT5CR3LP", "AAPL"));
 }
 
 void loop() {
@@ -94,24 +101,10 @@ void loop() {
   String second = String(TimeStruct.Seconds);
 
   String time = hour + ":" + minute + ":" + second;
-  canvas.clear();
-  canvas.createSprite(TFT_HEIGHT, TFT_WIDTH);
-  canvas.fillSprite(BACKGROUND_COLOR);
-  // canvas.setCursor(0,0);
-  // canvas.setTextSize(1);
-  // canvas.setFont(&fonts::Font7);
-  // canvas.setTextColor(FOREGROUND_COLOR, BACKGROUND_COLOR);
-  // canvas.drawString(time, x, y);
-
-  // canvas.setCursor(0, 50);
-  // canvas.setFont(&fonts::Orbitron_Light_24);
-  // canvas.drawString("Hello World", 0, 50);
 
   Main_Clock::drawWidget();
-  // // Only the following process is actually drawn on the panel.
-  
-  display.startWrite(); 
+
+  display.startWrite();
   canvas.pushSprite(0, 0);
   display.endWrite();
-  //delay(1000);
 }

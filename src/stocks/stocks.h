@@ -1,5 +1,8 @@
 #include <Arduino.h>
 
 namespace Stocks {
-    String getName(const char *alpha_vantage_key, const char *stock_symbol);
-}
+void init();
+String getName(const char *stock_symbol);
+String getQuoteString(const char *stock_symbol);
+double getQuote(const char *stock_symbol);
+} // namespace Stocks
