@@ -18,6 +18,8 @@ RTC_DateTypeDef DateStruct;
 M5GFX display;
 M5Canvas canvas(&display);
 
+bool internetConnectionSuccessful{false};
+
 // TODO
 /*
 - Add a way to set the timezone from that same file
@@ -78,8 +80,19 @@ void setup() {
     M5.Rtc.SetDate(&DateStruct);
 
     SD.end();
+    internetConnectionSuccessful = true;
   } else {
     Serial.println("WiFi Connection failed! Set time manually.");
+
+    // Temporary offline settinng of the clock so that I can work on this
+    // without wifi
+    DateStruct.Month = 2;
+    DateStruct.Date = 2;
+    DateStruct.Year = 2023;
+
+    TimeStruct.Hours = 12;
+    TimeStruct.Minutes = 12;
+    TimeStruct.Seconds = 12;
   }
 
   display.begin();

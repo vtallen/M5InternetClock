@@ -25,7 +25,7 @@ char *getALPHA_VANTAGE_KEY() {
   return ALPHA_VANTAGE_KEY;
 }
 
-void parseLine(String &value) {
+void parseConfigLine(String &value) {
   int delimiterIndex;
   String parameter;
 
@@ -63,15 +63,29 @@ void loadConfig() {
   if (file) {
     while (file.available()) {
       String c = file.readStringUntil('\n');
-      parseLine(c);
+      parseConfigLine(c);
     }
     file.close();
 
     // causes stocks.cpp to call getALPHA_VANTAGE_KEY
     Stocks::init();
   } else {
-    Serial.println("Failed to open file.");
+    Serial.println("Failed to open WidgetClock.txt.");
   }
 }
 
+void parseStocksFileLine(String &value) {}
+
+void loadStocksFile() {
+  File file = SD.open("/Stocks.txt");
+  if (file) {
+    while (file.available()) {
+      String c = file.readStringUntil('\n');
+      parseStocksFileLine(c);
+    }
+    file.close();
+  } else {
+    Serial.println("Failed to open Stocks.txt.");
+  }
+}
 } // namespace Conf
