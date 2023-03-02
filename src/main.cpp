@@ -86,7 +86,7 @@ void setup() {
   Main_Clock::setDateStruct(&DateStruct);
   Main_Clock::setCanvas(&canvas);
   // gets the API key for the alpha vantage API from the conf_parser.cpp
-  Stocks::init();
+  // Stocks::init();
 
 }
 
