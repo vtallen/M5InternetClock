@@ -1,7 +1,7 @@
 # M5InternetClock
 ---
 An internet clock application for the M5Stack Core2 ESP32 micro controler. It features an LCD clock style with a stock price tracking widget.
-![Alt text](example_img/example.png?raw=true "Title")
+![interface](example_img/example.png?raw=true | width = 100)
 
 
 # Usage
