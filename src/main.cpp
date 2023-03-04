@@ -20,28 +20,15 @@ M5Canvas canvas(&display);
 
 bool internetConnectionSuccessful{false};
 
-// TODO
-/*
-- Add a way to set the timezone from that same file
-- Add a way to set the time manually, and a variable indicating that this needs
-to be done.
-
-- Add a scrolling stock ticker at the bottom of main_clock.cpp
-- Add a temperature for city section on one of the top corners
-
-- Add a controller to switch between widgets every x seconds
-
-- Add a stock witdget, allow multiple instances with different stocks to be
-called
-*/
-
 void setup() {
   M5.begin();
   SD.begin(4);
 
   Conf::loadConfig();
+
   char *SSID = Conf::getSSID();
   char *PASSWORD = Conf::getPASSWORD();
+  int *TIME_OFFSET = Conf::getTIME_OFFSET();
 
   display.begin();
   display.setTextDatum(top_left);
@@ -58,9 +45,7 @@ void setup() {
     NTPClient timeClient(ntpUDP);
 
     timeClient.update();
-    // Set to eastern time, will add the ability to chage this with a config
-    // file later
-    timeClient.setTimeOffset(-18000);
+    timeClient.setTimeOffset(*TIME_OFFSET);
 
     unsigned long epochTime = timeClient.getEpochTime();
     struct tm *ptm = gmtime((time_t *)&epochTime);
@@ -104,7 +89,6 @@ void setup() {
   Main_Clock::setDateStruct(&DateStruct);
   Main_Clock::setCanvas(&canvas);
   // gets the API key for the alpha vantage API from the conf_parser.cpp
-  // Stocks::init();
 }
 
 void loop() {

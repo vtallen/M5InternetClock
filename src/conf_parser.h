@@ -6,11 +6,9 @@ namespace Conf {
 char *getSSID();
 char *getPASSWORD();
 char *getALPHA_VANTAGE_KEY();
+int *getTIME_OFFSET();
 
 void loadConfig();
 
-// The file that contains the tickers of stocks that the user wants to be
-// tracked
-void loadStocksFile();
 } // namespace Conf
 #endif

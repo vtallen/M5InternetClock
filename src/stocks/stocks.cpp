@@ -1,15 +1,38 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
+#include <M5Core2.h>
 #include <WiFi.h>
+#include <vector>
 
 #include <conf_parser.h>
 
 namespace Stocks {
 char *ALPHA_VANTAGE_KEY;
+std::vector<String> STOCK_TICKERS;
+
+void loadStocksFile() {
+  File file = SD.open("/Stocks.txt");
+  if (file) {
+    while (file.available()) {
+      String c = file.readStringUntil('\n');
+      STOCK_TICKERS.push_back(c);
+      Serial.println("Loaded stock " + c);
+    }
+  } else {
+    Serial.println("Failed to open Stocks.txt.");
+  }
+
+  file.close();
+}
 
 // Do not call before the config file has been fully read and parsed, it will
 // segfault/be caught by the assert statement
-void init() { ALPHA_VANTAGE_KEY = Conf::getALPHA_VANTAGE_KEY(); }
+void init() {
+  ALPHA_VANTAGE_KEY = Conf::getALPHA_VANTAGE_KEY();
+  loadStocksFile();
+}
+
+std::vector<String> &getSTOCK_TICKERS() { return STOCK_TICKERS; }
 
 StaticJsonDocument<2000> getStockQuote(const char *stock_symbol) {
 
@@ -76,7 +99,9 @@ String getQuoteString(const char *stock_symbol) {
 
   String quote = jsonDoc["Global Quote"]["05. price"];
 
-  return quote;
+  float price = quote.toFloat();
+
+  return String(price, 2);
 }
 
 double getQuote(const char *stock_symbol) {

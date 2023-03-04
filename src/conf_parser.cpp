@@ -1,11 +1,15 @@
 #include <M5Core2.h>
+#include <string>
 
 #include <stocks/stocks.h>
+
+#include <vector>
 
 namespace Conf {
 // WiFi Credentials
 char *SSID{};
 char *PASSWORD{};
+int *TIME_OFFSET{};
 
 // Stock API for fetching prices
 char *ALPHA_VANTAGE_KEY{};
@@ -23,6 +27,11 @@ char *getPASSWORD() {
 char *getALPHA_VANTAGE_KEY() {
   assert(ALPHA_VANTAGE_KEY);
   return ALPHA_VANTAGE_KEY;
+}
+
+int *getTIME_OFFSET() {
+  assert(TIME_OFFSET);
+  return TIME_OFFSET;
 }
 
 void parseConfigLine(String &value) {
@@ -55,18 +64,20 @@ void parseConfigLine(String &value) {
     strcpy(value_ptr, value.c_str());
 
     ALPHA_VANTAGE_KEY = value_ptr;
+  } else if (parameter == "TIME_OFFSET_UTC_SECONDS") {
+    int offset = std::stoi(value.c_str());
+    TIME_OFFSET = &offset;
   }
 }
 
 void loadConfig() {
-  File file = SD.open("/WidgetClock.txt");
+  File file = SD.open("/M5Clock.txt");
   if (file) {
     while (file.available()) {
       String c = file.readStringUntil('\n');
       parseConfigLine(c);
     }
     file.close();
-
     // causes stocks.cpp to call getALPHA_VANTAGE_KEY
     Stocks::init();
   } else {
@@ -74,18 +85,4 @@ void loadConfig() {
   }
 }
 
-void parseStocksFileLine(String &value) {}
-
-void loadStocksFile() {
-  File file = SD.open("/Stocks.txt");
-  if (file) {
-    while (file.available()) {
-      String c = file.readStringUntil('\n');
-      parseStocksFileLine(c);
-    }
-    file.close();
-  } else {
-    Serial.println("Failed to open Stocks.txt.");
-  }
-}
 } // namespace Conf

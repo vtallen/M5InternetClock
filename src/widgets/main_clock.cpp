@@ -5,6 +5,7 @@
 #include <M5GFX.h>
 #include <WiFi.h>
 
+#include <stocks/stocks.h>
 #include <theme.h>
 
 namespace Main_Clock {
@@ -186,7 +187,108 @@ void drawDate(int x, int y, float size) {
 
 void drawTemp(int x, int y, float size) {}
 
-void drawScrollingStocks(int y, float size) {}
+void drawStocks(int y, float size) {
+  static unsigned long lastUpdateTime{0};
+  static unsigned long lastStockSwitch {0};
+  static bool isFirstCall {true};
+  static int currentStock{0};
+
+  canvas->setFont(&Theme::TEXT_FONT);
+  canvas->setTextSize(size);
+  canvas->setTextColor(Theme::FOREGROUND_COLOR, Theme::BACKGROUND_COLOR);
+
+  static std::vector<String> STOCK_TICKERS = Stocks::getSTOCK_TICKERS();
+  static String text;
+
+  if (isFirstCall) {
+    isFirstCall = false;
+    Serial.println("Here 1");
+    text = STOCK_TICKERS.at(currentStock) + " " +
+           Stocks::getQuoteString(STOCK_TICKERS.at(currentStock).c_str());
+  }
+
+  if (millis() - lastUpdateTime >= 30000) {
+    text = STOCK_TICKERS.at(currentStock) + " " +
+           Stocks::getQuoteString(STOCK_TICKERS.at(currentStock).c_str());
+    lastUpdateTime = millis(); // update the last update time
+  }
+
+  if (millis() - lastStockSwitch >= 60000) {
+    Serial.println("Changing stock");
+    ++currentStock;
+    if (currentStock > (STOCK_TICKERS.size() - 1)) {
+      currentStock = 0;
+    }
+
+    lastStockSwitch = millis();
+  }
+
+  canvas->drawString(text, (320/2) - (canvas->textWidth(text) / 2), y);
+}
+
+// This function caused lots of lag... not exactly sure why.
+/*
+void drawScrollingStocks(int y, float size) {
+  static unsigned long lastStockUpdateTime{0};
+
+  static unsigned long lastMoveUpdateTime{0};
+  static int x{0};
+
+  canvas->setFont(&Theme::TEXT_FONT);
+  canvas->setTextSize(size);
+  canvas->setTextColor(Theme::FOREGROUND_COLOR, Theme::BACKGROUND_COLOR);
+
+  static std::vector<String> STOCK_TICKERS = Stocks::getSTOCK_TICKERS();
+
+  static String stock1;
+  static String stock2;
+  static String stock3;
+  static String text;
+
+  if (lastStockUpdateTime == 0) {
+    stock1 = STOCK_TICKERS.at(0) + " " +
+             Stocks::getQuoteString(STOCK_TICKERS.at(0).c_str());
+
+    stock2 = STOCK_TICKERS.at(1) + " " +
+             Stocks::getQuoteString(STOCK_TICKERS.at(1).c_str());
+
+    stock3 = STOCK_TICKERS.at(2) + " " +
+             Stocks::getQuoteString(STOCK_TICKERS.at(2).c_str());
+
+    text = stock1 + " - " + stock2 + " - " + stock3;
+  }
+
+  unsigned long millisTime = millis();
+
+  if (millisTime - lastStockUpdateTime >= 80000) {
+    Serial.println("update");
+    stock1 = STOCK_TICKERS.at(0) + " " +
+             Stocks::getQuoteString(STOCK_TICKERS.at(0).c_str());
+
+    stock2 = STOCK_TICKERS.at(1) + " " +
+             Stocks::getQuoteString(STOCK_TICKERS.at(1).c_str());
+
+    stock3 = STOCK_TICKERS.at(2) + " " +
+             Stocks::getQuoteString(STOCK_TICKERS.at(2).c_str());
+
+    text = stock1 + " - " + stock2 + " - " + stock3;
+
+    lastStockUpdateTime = millis(); // update the last update time
+  }
+
+  static int offScreenX = (-1 * canvas->textWidth(text)) - 300;
+
+  if (millisTime - lastMoveUpdateTime >= 1000) {
+    if (x >= offScreenX) {
+      x -= 1;
+    } else if (x <= offScreenX) {
+      x = 320;
+    }
+  }
+
+  canvas->drawString(text, x, y);
+}
+*/
 
 // Draws all of the parts of the widget on to the canvas
 void drawWidget() {
@@ -196,6 +298,7 @@ void drawWidget() {
 
   drawClock(30, 60, 1.5);
   drawDate(56, 135, 1);
+  drawStocks(200, 1);
 }
 
 } // namespace Main_Clock
