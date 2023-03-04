@@ -189,8 +189,8 @@ void drawTemp(int x, int y, float size) {}
 
 void drawStocks(int y, float size) {
   static unsigned long lastUpdateTime{0};
-  static unsigned long lastStockSwitch {0};
-  static bool isFirstCall {true};
+  static unsigned long lastStockSwitch{0};
+  static bool isFirstCall{true};
   static int currentStock{0};
 
   canvas->setFont(&Theme::TEXT_FONT);
@@ -202,7 +202,6 @@ void drawStocks(int y, float size) {
 
   if (isFirstCall) {
     isFirstCall = false;
-    Serial.println("Here 1");
     text = STOCK_TICKERS.at(currentStock) + " " +
            Stocks::getQuoteString(STOCK_TICKERS.at(currentStock).c_str());
   }
@@ -223,7 +222,7 @@ void drawStocks(int y, float size) {
     lastStockSwitch = millis();
   }
 
-  canvas->drawString(text, (320/2) - (canvas->textWidth(text) / 2), y);
+  canvas->drawString(text, (320 / 2) - (canvas->textWidth(text) / 2), y);
 }
 
 // This function caused lots of lag... not exactly sure why.
